@@ -93,7 +93,7 @@ def main():
         elif response == "n":
             break
         else:
-            print("Please respone 'y' or 'n'")
+            print("Please respond with 'y' or 'n'")
             continue
 
 main()
