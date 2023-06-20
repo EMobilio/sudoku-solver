@@ -52,4 +52,25 @@ class Board:
                     return (row, col)
 
         return None
+    
+    """ Inputs: value- integer from 1-9 to be placed
+                row- row index
+                col- column index
+                
+        method that updates self.cells by placing the specified value
+        in the specified position indicated by row and col
+    """
+    def placeValue(self, value, row, col):
+        self.cells[row][col] = value
+        
+
+    """ Inputs: row- row index of value to be removed
+                col- column index of value to be removed
+                
+        method that updates self.cells by removing the value
+        from the specified position indicated by row and col by
+        setting the value at the position to 0
+    """
+    def removeValue(self, row, col):
+        self.cells[row][col] = 0
 
