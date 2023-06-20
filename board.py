@@ -5,11 +5,12 @@ class Board:
     NUM_ROWS = 9
     NUM_COLS = 9
 
-    """ Initializer that takes a rank representing the difficulty level
-        and uses dokusan to generate a puzzle of the specified difficulty,
-        copying the puzzle to the cells field. 0 represents an empty space
-    """
+   
     def __init__(self, rank):
+        """ Initializer that takes a rank representing the difficulty level
+            and uses dokusan to generate a puzzle of the specified difficulty,
+            copying the puzzle to the cells field. 0 represents an empty space
+        """
         # initialize an empty 9x9 2-D list 
         self.cells = [[""] * self.NUM_ROWS for row in range(self.NUM_COLS)]
  
@@ -21,8 +22,8 @@ class Board:
             for col in range(self.NUM_COLS):
                 self.cells[row][col] = int(puzzle[self.NUM_ROWS*row + col])
 
-    """ method for representing the board object as a sring """
     def __repr__(self):
+        """ method for representing the board object as a sring """
         s = ""
 
         for row in range(self.NUM_ROWS):
@@ -41,11 +42,10 @@ class Board:
 
         return s
     
-    """ method that loops through the board's cells to find and return
-        a tuple representing the position of a blank space (or None if
-        the board is complete)
-    """
     def getBlank(self):
+        """ loops through the board's cells to find and return tuple representing the 
+            position of a blank space (or None if the board is complete)
+        """
         for row in range(self.NUM_ROWS):
             for col in range(self.NUM_COLS):
                 if self.cells[row][col] == 0:
@@ -53,24 +53,25 @@ class Board:
 
         return None
     
-    """ Inputs: value- integer from 1-9 to be placed
+    
+    def placeValue(self, value, row, col):
+        """ Inputs: value- integer from 1-9 to be placed
                 row- row index
                 col- column index
                 
-        method that updates self.cells by placing the specified value
-        in the specified position indicated by row and col
-    """
-    def placeValue(self, value, row, col):
+            updates self.cells by placing the specified value
+            in the specified position indicated by row and col
+        """
         self.cells[row][col] = value
         
 
-    """ Inputs: row- row index of value to be removed
+    
+    def removeValue(self, row, col):
+        """ Inputs: row- row index of value to be removed
                 col- column index of value to be removed
                 
-        method that updates self.cells by removing the value
-        from the specified position indicated by row and col by
-        setting the value at the position to 0
-    """
-    def removeValue(self, row, col):
+            updates self.cells by removing the value rom the specified position
+            indicated by row and col by setting the value at the position to 0
+        """
         self.cells[row][col] = 0
 
