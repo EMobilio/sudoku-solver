@@ -7,7 +7,7 @@ class Board:
 
    
     def __init__(self, rank):
-        """ Initializer that takes an int (rank)y representing the difficulty level
+        """ Initializer that takes an integer (rank) representing the difficulty level
             and uses dokusan to generate a puzzle of the specified difficulty,
             copying the puzzle to the cells field. 0 represents an empty space
         """
