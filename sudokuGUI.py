@@ -13,8 +13,8 @@ YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 
 # Difficulty constants
-EASY = 25
-MEDIUM = 100
+EASY = 100
+MEDIUM = 500
 HARD = 1000
 
 pygame.init()
@@ -42,15 +42,16 @@ hard_text = BUTTON_FONT.render("Hard", False, BLACK)
 hard_button = pygame.Rect(0, 0, 200, 100)
 hard_button.center = (WIDTH/2, 540)
 
-def draw_screen(game_active):
+def draw_screen(game_active, board):
     """ Input: game_active- boolean representing whether the game is active
+               board- Board object
     
         Draws the current state of the screen based on inputs
     """
-    # if game is active draw the game board and screen
+    # if game is active draw the game board and screen, otherwise draw the title screen
     if game_active:
         screen.fill(WHITE)
-    # otherwise draw the title screen
+        board.draw_board(screen)
     else: 
         screen.fill(WHITE)
         screen.blit(title, (WIDTH/2 - title.get_width()/2, 60))
@@ -70,6 +71,7 @@ def main():
     """ main game loop """
     run = True
     game_active = False
+    board = None
 
     while run:
         clock.tick(FPS)
@@ -84,12 +86,15 @@ def main():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if easy_button.collidepoint(event.pos):
                         game_active = True
+                        board = Board(EASY)
                     if medium_button.collidepoint(event.pos):
                         game_active = True
+                        board = Board(MEDIUM)
                     if hard_button.collidepoint(event.pos):
                         game_active = True
+                        board = Board(HARD)
 
-        draw_screen(game_active)
+        draw_screen(game_active, board)
 
 if __name__ == "__main__":
     main()
