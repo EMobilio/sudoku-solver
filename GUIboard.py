@@ -2,6 +2,8 @@ import pygame
 from dokusan import generators
 
 pygame.font.init()
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
 class Board:
     """ A class for objects representing a 9x9 sudoku board """
@@ -41,19 +43,62 @@ class Board:
                 thickness = 3
             else:
                 thickness = 1
-            pygame.draw.line(screen, (0, 0, 0), (130, 10 + i*60), (670, 10 + i*60), thickness)
+            pygame.draw.line(screen, BLACK, (130, 10 + i*60), (670, 10 + i*60), thickness)
             for j in range(self.NUM_COLS +1):
                 if j % 3 == 0:
                     thickness = 3
                 else:
                     thickness = 1
-                pygame.draw.line(screen, (0, 0, 0), (130 + j*60, 10), (130 + j*60, 550), thickness)
+                pygame.draw.line(screen, BLACK, (130 + j*60, 10), (130 + j*60, 550), thickness)
 
         # draw cell values
         for row in range(self.NUM_ROWS):
             for col in range(self.NUM_COLS):
                 self.cells[row][col].draw_cell(screen)
+
+    def click(self, pos):
+        """ Input: pos- tuple of coordinates
+
+            Determines if the user has clicked on a cell, converting the click
+            position to an index on the board and calling the select() method
+            if the selected cell was not a given clue
+        """
+        if 130 < pos[0] < 670 and 10 < pos[1] < 550:
+            row = (pos[1] - 10)//60
+            col = (pos[0] - 130)//60
+            if self.cells[row][col].given == False:
+                self.select(row, col)
+    
+    def select(self, row, col):
+        """ Inputs: row- row index
+                    col- column index
+
+            Sets the boards selected attribute to the row and column index and
+            sets the corresponding Cell objects selected attribute to True
+        """
+        self.selected = (row, col)
+        # reset all cells' selected attributes to False and then set the newly selected one to True
+        for i in range(self.NUM_ROWS):
+            for j in range(self.NUM_COLS):
+                self.cells[i][j].selected = False
+        self.cells[row][col].selected = True
+
+    def place(self, val):
+        """ Input: val- integer
         
+            Sets the selected cell's val attribute to val
+        """
+        if self.selected != None:
+            row = self.selected[0]
+            col = self.selected[1]
+            self.cells[row][col].val = val
+
+    def delete(self):
+        """ Sets the selected cell's val attribute to None """
+        if self.selected != None:
+            row = self.selected[0]
+            col = self.selected[1]
+            self.cells[row][col].val = None
         
 class Cell:
     """ A class for objects representing the individual cells of a sudoku board """
@@ -70,6 +115,7 @@ class Cell:
         self.row = row
         self.col = col
         self.given = given
+        self.selected = False
 
     def draw_cell(self, screen):
         """ Input: screen- display surface
@@ -78,11 +124,15 @@ class Cell:
         """
         # determine which text type to use based on if the cell value was given or input by the user
         if self.given == True:
-            cell_text = self.GIVEN_CELL_FONT.render(str(self.val), False, (0, 0, 0))
+            cell_text = self.GIVEN_CELL_FONT.render(str(self.val), False, BLACK)
         else:
-            cell_text = self.USER_CELL_FONT.render(str(self.val), False, (0, 0, 0))
+            cell_text = self.USER_CELL_FONT.render(str(self.val), False, BLACK)
 
         # draw value if not None
         if self.val != None:
             screen.blit(cell_text, 
                         (130 + 60*self.col + 30 - cell_text.get_width()/2, 10 + 60*self.row + 30 - cell_text.get_height()/2))
+            
+        # if the cell has been selected draw a red rectangle around it
+        if self.selected == True:
+            pygame.draw.rect(screen, RED, (130 + self.col*60, 10 + self.row*60, 61, 61), width=3)
