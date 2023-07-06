@@ -81,6 +81,35 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
+            if game_active == True:
+                # check if the user has clicked a cell
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    board.click(event.pos)
+
+                # check if the user is entering or deleting a value
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_1:
+                        board.place(1)
+                    if event.key == pygame.K_2:
+                        board.place(2)
+                    if event.key == pygame.K_3:
+                        board.place(3)
+                    if event.key == pygame.K_4:
+                        board.place(4)
+                    if event.key == pygame.K_5:
+                        board.place(5)
+                    if event.key == pygame.K_6:
+                        board.place(6)
+                    if event.key == pygame.K_7:
+                        board.place(7)
+                    if event.key == pygame.K_8:
+                        board.place(8)
+                    if event.key == pygame.K_9:
+                        board.place(9)
+                    if event.key == pygame.K_BACKSPACE:
+                        board.delete()
+            
             if game_active == False:
                 # check for button presses
                 if event.type == pygame.MOUSEBUTTONDOWN:
