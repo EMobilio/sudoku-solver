@@ -54,7 +54,7 @@ class Board:
         # draw cell values
         for row in range(self.NUM_ROWS):
             for col in range(self.NUM_COLS):
-                self.cells[row][col].draw_cell(screen)
+                self.cells[row][col].draw_cell(screen, self)
 
     def click(self, pos):
         """ Input: pos- tuple of coordinates
@@ -162,7 +162,7 @@ class Cell:
         self.given = given
         self.selected = False
 
-    def draw_cell(self, screen):
+    def draw_cell(self, screen, board):
         """ Input: screen- display surface
         
             Draws the cell value to the screen its proper location
@@ -177,6 +177,12 @@ class Cell:
         if self.val != None:
             screen.blit(cell_text, 
                         (130 + 60*self.col + 30 - cell_text.get_width()/2, 10 + 60*self.row + 30 - cell_text.get_height()/2))
+            # if the value is not valid in the space, draw a red circle indicator
+            if board.isValid(self.val, self.row, self.col) == False:
+                pygame.draw.circle(screen, 
+                                   RED, 
+                                   (130 + 60*self.col + 30 - cell_text.get_width()/2 - 5, 10 + 60*self.row + 30 - cell_text.get_height()/2),
+                                   5)
             
         # if the cell has been selected draw a red rectangle around it
         if self.selected == True:
