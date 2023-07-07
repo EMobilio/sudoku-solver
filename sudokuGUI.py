@@ -9,6 +9,7 @@ FPS = 60
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 
@@ -25,6 +26,7 @@ clock = pygame.time.Clock()
 # Fonts
 TITLE_FONT = pygame.font.SysFont("comicsans", 80)
 BUTTON_FONT = pygame.font.SysFont("comicsans", 30)
+WIN_FONT = pygame.font.SysFont("comicsans", 50)
 
 # Title text
 title = TITLE_FONT.render("Sudoku", False, BLACK)
@@ -42,11 +44,12 @@ hard_text = BUTTON_FONT.render("Hard", False, BLACK)
 hard_button = pygame.Rect(0, 0, 200, 100)
 hard_button.center = (WIDTH/2, 540)
 
-solve_text = BUTTON_FONT.render("Solve For Me", False, BLACK)
-solve_button = pygame.Rect(0, 0, 300, 100)
-solve_button.center = (WIDTH/2, 625)
+game_button = pygame.Rect(0, 0, 300, 100)
+game_button.center = (WIDTH/2, 625)
 
+solve_text = BUTTON_FONT.render("Solve For Me", False, BLACK)
 return_text = BUTTON_FONT.render("Return Home", False, BLACK)
+win_msg = WIN_FONT.render("Solved!", False, BLACK)
 
 def draw_screen(game_active, solved, board):
     """ Input: game_active- boolean representing whether the game is active
@@ -57,29 +60,30 @@ def draw_screen(game_active, solved, board):
     """
     # if game is active or puzzle is solved draw the game board and screen, otherwise draw the title screen
     if game_active or solved:
-        solved = board.isSolved()
         screen.fill(WHITE)
         board.draw_board(screen, solved)
-        pygame.draw.rect(screen, GREEN, solve_button, border_radius=20)
+        pygame.draw.rect(screen, BLUE, game_button, border_radius=20)
         if solved:
             game_active = False
             screen.blit(return_text, 
-                        (solve_button.x + solve_button.width/2 - return_text.get_width()/2, solve_button.y + solve_button.height/2 - return_text.get_height()/2,))
+                        (game_button.x + game_button.width/2 - return_text.get_width()/2, game_button.y + game_button.height/2 - return_text.get_height()/2))
+            screen.blit(win_msg, 
+                        (WIDTH/2 - game_button.width/2 - 125 - win_msg.get_width()/2,game_button.y + game_button.height/2 - win_msg.get_height()/2,))
         else:
             screen.blit(solve_text, 
-                        (solve_button.x + solve_button.width/2 - solve_text.get_width()/2, solve_button.y + solve_button.height/2 - solve_text.get_height()/2,))
+                        (game_button.x + game_button.width/2 - solve_text.get_width()/2, game_button.y + game_button.height/2 - solve_text.get_height()/2))
     else: 
         screen.fill(WHITE)
         screen.blit(title, (WIDTH/2 - title.get_width()/2, 60))
         pygame.draw.rect(screen, GREEN, easy_button, border_radius=20)
         screen.blit(easy_text, 
-                    (easy_button.x + easy_button.width/2 - easy_text.get_width()/2, easy_button.y + easy_button.height/2 - easy_text.get_height()/2,))
+                    (easy_button.x + easy_button.width/2 - easy_text.get_width()/2, easy_button.y + easy_button.height/2 - easy_text.get_height()/2))
         pygame.draw.rect(screen, YELLOW, medium_button, border_radius=20)
         screen.blit(medium_text, 
-                    (medium_button.x + medium_button.width/2 - medium_text.get_width()/2, medium_button.y + medium_button.height/2 - medium_text.get_height()/2,))
+                    (medium_button.x + medium_button.width/2 - medium_text.get_width()/2, medium_button.y + medium_button.height/2 - medium_text.get_height()/2))
         pygame.draw.rect(screen, RED, hard_button, border_radius=20)
         screen.blit(hard_text, 
-                    (hard_button.x + hard_button.width/2 - hard_text.get_width()/2, hard_button.y + hard_button.height/2 - hard_text.get_height()/2,))
+                    (hard_button.x + hard_button.width/2 - hard_text.get_width()/2, hard_button.y + hard_button.height/2 - hard_text.get_height()/2))
     
     pygame.display.update()
 
@@ -102,7 +106,7 @@ def main():
             if game_active == True:
                 # check if the user has clicked a cell
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    board.click(event.pos)
+                        board.click(event.pos)
 
                 # check if the user is entering or deleting a value
                 if event.type == pygame.KEYDOWN:
@@ -126,8 +130,16 @@ def main():
                         board.place(9)
                     if event.key == pygame.K_BACKSPACE:
                         board.delete()
-            
-            if game_active == False:
+
+            if solved == True:
+                # check for button presses
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if game_button.collidepoint(event.pos):
+                        solved = False
+                        game_active = False
+                        board = None
+
+            if game_active == False and solved == False:
                 # check for button presses
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if easy_button.collidepoint(event.pos):
@@ -139,6 +151,9 @@ def main():
                     if hard_button.collidepoint(event.pos):
                         game_active = True
                         board = Board(HARD)
+
+        if board != None:
+            solved = board.isSolved()
 
         draw_screen(game_active, solved, board)
 
