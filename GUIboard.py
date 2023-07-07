@@ -99,6 +99,51 @@ class Board:
             row = self.selected[0]
             col = self.selected[1]
             self.cells[row][col].val = None
+
+    def isValid(self, val, row, col):
+        """ Inputs: val- integer
+                    row- row index (int)
+                    col- column index (int)
+          
+            Outputs: a boolean indicating whether the given value can be placed in the 
+            specified position on the board based on whether the value is already in the 
+            position's row, column or inner box      
+        """
+        # check if the value is already in the row
+        for c in range(self.NUM_COLS):
+            if self.cells[row][c].val == val and c != col:
+                return False
+            
+        # check if the value is already in the column
+        for r in range(self.NUM_ROWS):
+            if self.cells[r][col].val == val and r != row:
+                return False
+
+        # check if the value is already in the inner 3x3 box the given position 
+        # lies in (position (row, col) falls in the inner box in the range of 
+        # rows from 3*(row // 3) to 3*(row // 3) + 3 - 1 and colums from 3*(col) // 3) to 
+        # 3*(row // 3) + 3 - 1) 
+        for r in range(3*(row // 3) , 3*(row // 3) + 3):
+            for c in range(3*(col // 3), 3*(col // 3) + 3):
+                if self.cells[r][c].val == val and r != row and c != col:
+                    return False
+
+        # if the value is not in the row, column or inner box, the position is valid    
+        return True
+    
+    def isSolved(self):
+        """ Checks if the puzzle has been solved in its current state """
+        # if any cell is empty or has an invalid value, return False
+        for row in range(self.NUM_ROWS):
+            for col in range(self.NUM_COLS):
+                if self.cells[row][col].val == None:
+                    return False
+                elif self.isValid(self.cells[row][col].val, row, col) == False:
+                    return False
+        
+        # otherwise return True
+        return True
+
         
 class Cell:
     """ A class for objects representing the individual cells of a sudoku board """
