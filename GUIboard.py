@@ -31,8 +31,9 @@ class Board:
                 else:
                     self.cells[row][col] = Cell(None, row, col, False)
 
-    def draw_board(self, screen):
+    def draw_board(self, screen, solved):
         """ Input: screen- display surface
+                   solved- boolean representing whether the puzzle has been solved
 
             Draws the grid lines of the board and calls the draw_cell() method
             for each cell
@@ -54,7 +55,7 @@ class Board:
         # draw cell values
         for row in range(self.NUM_ROWS):
             for col in range(self.NUM_COLS):
-                self.cells[row][col].draw_cell(screen, self)
+                self.cells[row][col].draw_cell(screen, self, solved)
 
     def click(self, pos):
         """ Input: pos- tuple of coordinates
@@ -162,8 +163,10 @@ class Cell:
         self.given = given
         self.selected = False
 
-    def draw_cell(self, screen, board):
+    def draw_cell(self, screen, board, solved):
         """ Input: screen- display surface
+                   board- Board object
+                   solved- boolean representing if the puzzle has been solved
         
             Draws the cell value to the screen its proper location
         """
@@ -184,6 +187,6 @@ class Cell:
                                    (130 + 60*self.col + 30 - cell_text.get_width()/2 - 5, 10 + 60*self.row + 30 - cell_text.get_height()/2),
                                    5)
             
-        # if the cell has been selected draw a red rectangle around it
-        if self.selected == True:
+        # if the cell has been selected and the puzzle has not been solved draw a red rectangle around it
+        if self.selected == True and not solved:
             pygame.draw.rect(screen, RED, (130 + self.col*60, 10 + self.row*60, 61, 61), width=3)

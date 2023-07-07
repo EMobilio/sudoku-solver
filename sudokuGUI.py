@@ -13,7 +13,7 @@ YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 
 # Difficulty constants
-EASY = 100
+EASY = 5
 MEDIUM = 500
 HARD = 1000
 
@@ -42,16 +42,32 @@ hard_text = BUTTON_FONT.render("Hard", False, BLACK)
 hard_button = pygame.Rect(0, 0, 200, 100)
 hard_button.center = (WIDTH/2, 540)
 
-def draw_screen(game_active, board):
+solve_text = BUTTON_FONT.render("Solve For Me", False, BLACK)
+solve_button = pygame.Rect(0, 0, 300, 100)
+solve_button.center = (WIDTH/2, 625)
+
+return_text = BUTTON_FONT.render("Return Home", False, BLACK)
+
+def draw_screen(game_active, solved, board):
     """ Input: game_active- boolean representing whether the game is active
+               solved- boolean representing whether the puzzle has been solved 
                board- Board object
     
         Draws the current state of the screen based on inputs
     """
-    # if game is active draw the game board and screen, otherwise draw the title screen
-    if game_active:
+    # if game is active or puzzle is solved draw the game board and screen, otherwise draw the title screen
+    if game_active or solved:
+        solved = board.isSolved()
         screen.fill(WHITE)
-        board.draw_board(screen)
+        board.draw_board(screen, solved)
+        pygame.draw.rect(screen, GREEN, solve_button, border_radius=20)
+        if solved:
+            game_active = False
+            screen.blit(return_text, 
+                        (solve_button.x + solve_button.width/2 - return_text.get_width()/2, solve_button.y + solve_button.height/2 - return_text.get_height()/2,))
+        else:
+            screen.blit(solve_text, 
+                        (solve_button.x + solve_button.width/2 - solve_text.get_width()/2, solve_button.y + solve_button.height/2 - solve_text.get_height()/2,))
     else: 
         screen.fill(WHITE)
         screen.blit(title, (WIDTH/2 - title.get_width()/2, 60))
@@ -71,6 +87,7 @@ def main():
     """ main game loop """
     run = True
     game_active = False
+    solved = False
     board = None
 
     while run:
@@ -123,7 +140,7 @@ def main():
                         game_active = True
                         board = Board(HARD)
 
-        draw_screen(game_active, board)
+        draw_screen(game_active, solved, board)
 
 if __name__ == "__main__":
     main()
