@@ -14,9 +14,9 @@ YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 
 # Difficulty constants
-EASY = 5
-MEDIUM = 500
-HARD = 1000
+EASY = 50
+MEDIUM = 150
+HARD = 450
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -93,6 +93,7 @@ def main():
     game_active = False
     solved = False
     board = None
+    clicked = False
 
     while run:
         clock.tick(FPS)
@@ -103,10 +104,33 @@ def main():
                 pygame.quit()
                 exit()
 
-            if game_active == True:
+            # check for clicks here to avoid continuous clicking
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                clicked = True
+
+            if game_active == False and solved == False:
+                # check for button presses
+                if clicked:
+                    if easy_button.collidepoint(event.pos):
+                        game_active = True
+                        board = Board(EASY)
+                    if medium_button.collidepoint(event.pos):
+                        game_active = True
+                        board = Board(MEDIUM)
+                    if hard_button.collidepoint(event.pos):
+                        game_active = True
+                        board = Board(HARD)
+                    clicked = False
+
+            if game_active == True and solved == False:
                 # check if the user has clicked a cell
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                        board.click(event.pos)
+                if clicked:
+                    board.click(event.pos)
+                    if game_button.collidepoint(event.pos):
+                        board.clearBoard()
+                        board.solve(game_active, solved)
+                        solved = True
+                    clicked = False
 
                 # check if the user is entering or deleting a value
                 if event.type == pygame.KEYDOWN:
@@ -130,27 +154,15 @@ def main():
                         board.place(9)
                     if event.key == pygame.K_BACKSPACE:
                         board.delete()
-
+                        
             if solved == True:
                 # check for button presses
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if clicked:
                     if game_button.collidepoint(event.pos):
                         solved = False
                         game_active = False
                         board = None
-
-            if game_active == False and solved == False:
-                # check for button presses
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if easy_button.collidepoint(event.pos):
-                        game_active = True
-                        board = Board(EASY)
-                    if medium_button.collidepoint(event.pos):
-                        game_active = True
-                        board = Board(MEDIUM)
-                    if hard_button.collidepoint(event.pos):
-                        game_active = True
-                        board = Board(HARD)
+                    clicked = False
 
         if board != None:
             solved = board.isSolved()

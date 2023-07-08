@@ -1,5 +1,6 @@
 import pygame
 from dokusan import generators
+from sudokuGUI import draw_screen
 
 pygame.font.init()
 BLACK = (0, 0, 0)
@@ -132,6 +133,17 @@ class Board:
         # if the value is not in the row, column or inner box, the position is valid    
         return True
     
+    def getBlank(self):
+        """ Loops through the board's cells to find and return tuple representing the 
+            position of a blank space (or None if the board is complete)
+        """
+        for row in range(self.NUM_ROWS):
+            for col in range(self.NUM_COLS):
+                if self.cells[row][col].val == None:
+                    return (row, col)
+                
+        return None
+
     def isSolved(self):
         """ Checks if the puzzle has been solved in its current state """
         # if any cell is empty or has an invalid value, return False
@@ -145,6 +157,46 @@ class Board:
         # otherwise return True
         return True
 
+    def solve(self, game_active, solved):
+        """ Inputs: game_active- boolean
+                    solved- boolean
+
+            Recursive backtracking method that solves the puzzle and updates
+            the board display as it goes for visualization purposes. Returns
+            a boolean value
+        """
+        # check if the puzzle is solved and return True if it is, otherwise get the next blank position
+        if self.isSolved():
+            return True
+        else:
+            position = self.getBlank()
+
+        # loop through ints 1-9 and check if they are valid in the current empty position,
+        # if yes place the value in the position, redraw the board, and make a recursive call
+        # to fill the next empty position
+        for num in range(1, 10):
+            if self.isValid(num, position[0], position[1]):
+                self.select(position[0], position[1])
+                self.place(num)
+                draw_screen(game_active, solved, self)
+                pygame.time.delay(60) # delay so the visualization isn't too fast to be seen
+                if self.solve(game_active, solved) == True:
+                    return True
+                self.select(position[0], position[1])
+                self.delete()
+                draw_screen(game_active, solved, self)
+                pygame.time.delay(60)
+                
+
+        return False
+
+    def clearBoard(self):
+        """ Clears the non-given spaces in the board """
+        for row in range(self.NUM_ROWS):
+            for col in range(self.NUM_COLS):
+                if self.cells[row][col].given == False:
+                    self.select(row, col)
+                    self.delete()
         
 class Cell:
     """ A class for objects representing the individual cells of a sudoku board """
