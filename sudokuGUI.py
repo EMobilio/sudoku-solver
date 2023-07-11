@@ -1,4 +1,5 @@
 import pygame
+import datetime
 from sys import exit
 from GUIboard import *
 
@@ -22,11 +23,14 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Sudoku")
 clock = pygame.time.Clock()
+start_time = 0
+final_time = 0
 
 # Fonts
 TITLE_FONT = pygame.font.SysFont("comicsans", 80)
 BUTTON_FONT = pygame.font.SysFont("comicsans", 30)
 WIN_FONT = pygame.font.SysFont("comicsans", 50)
+TIMER_FONT = pygame.font.SysFont("comicsans", 40)
 
 # Title text
 title = TITLE_FONT.render("Sudoku", False, BLACK)
@@ -51,27 +55,34 @@ solve_text = BUTTON_FONT.render("Solve For Me", False, BLACK)
 return_text = BUTTON_FONT.render("Return Home", False, BLACK)
 win_msg = WIN_FONT.render("Solved!", False, BLACK)
 
-def draw_screen(game_active, solved, board):
+def draw_screen(game_active, solved, board, start_time):
     """ Input: game_active- boolean representing whether the game is active
                solved- boolean representing whether the puzzle has been solved 
                board- Board object
+               start_time- integer representing the time in milliseconds since the game was started
     
         Draws the current state of the screen based on inputs
     """
     # if game is active or puzzle is solved draw the game board and screen, otherwise draw the title screen
     if game_active or solved:
+        current_time = pygame.time.get_ticks() - start_time
         screen.fill(WHITE)
         board.draw_board(screen, solved)
         pygame.draw.rect(screen, BLUE, game_button, border_radius=20)
         if solved:
-            game_active = False
+            time = str(datetime.timedelta(milliseconds=final_time))
+            time_text = TIMER_FONT.render(time[:-4], False, BLACK)
             screen.blit(return_text, 
                         (game_button.x + game_button.width/2 - return_text.get_width()/2, game_button.y + game_button.height/2 - return_text.get_height()/2))
             screen.blit(win_msg, 
-                        (WIDTH/2 - game_button.width/2 - 125 - win_msg.get_width()/2,game_button.y + game_button.height/2 - win_msg.get_height()/2,))
+                        (WIDTH/2 - game_button.width/2 - 125 - win_msg.get_width()/2, game_button.y + game_button.height/2 - win_msg.get_height()/2))
         else:
+            time = str(datetime.timedelta(milliseconds=current_time))
+            time_text = TIMER_FONT.render(time[:-4], False, BLACK)
             screen.blit(solve_text, 
                         (game_button.x + game_button.width/2 - solve_text.get_width()/2, game_button.y + game_button.height/2 - solve_text.get_height()/2))
+        screen.blit(time_text, 
+                    (WIDTH/2 + game_button.width/2 + 25, game_button.y + game_button.height/2 - time_text.get_height()/2))
     else: 
         screen.fill(WHITE)
         screen.blit(title, (WIDTH/2 - title.get_width()/2, 60))
@@ -94,6 +105,8 @@ def main():
     solved = False
     board = None
     clicked = False
+    global start_time
+    global final_time
 
     while run:
         clock.tick(FPS)
@@ -112,12 +125,15 @@ def main():
                 # check for button presses
                 if clicked:
                     if easy_button.collidepoint(event.pos):
+                        start_time = pygame.time.get_ticks()
                         game_active = True
                         board = Board(EASY)
                     if medium_button.collidepoint(event.pos):
+                        start_time = pygame.time.get_ticks()
                         game_active = True
                         board = Board(MEDIUM)
                     if hard_button.collidepoint(event.pos):
+                        start_time = pygame.time.get_ticks()
                         game_active = True
                         board = Board(HARD)
                     clicked = False
@@ -128,7 +144,7 @@ def main():
                     board.click(event.pos)
                     if game_button.collidepoint(event.pos):
                         board.clearBoard()
-                        board.solve(game_active, solved)
+                        board.solve(game_active, solved, start_time)
                         solved = True
                     clicked = False
 
@@ -164,10 +180,13 @@ def main():
                         board = None
                     clicked = False
 
-        if board != None:
+        if game_active:
             solved = board.isSolved()
+            if solved:
+                final_time = pygame.time.get_ticks() - start_time
+                game_active = False
 
-        draw_screen(game_active, solved, board)
+        draw_screen(game_active, solved, board, start_time)
 
 if __name__ == "__main__":
     main()

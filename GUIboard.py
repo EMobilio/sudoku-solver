@@ -157,9 +157,10 @@ class Board:
         # otherwise return True
         return True
 
-    def solve(self, game_active, solved):
+    def solve(self, game_active, solved, start_time):
         """ Inputs: game_active- boolean
                     solved- boolean
+                    start_time- integer
 
             Recursive backtracking method that solves the puzzle and updates
             the board display as it goes for visualization purposes. Returns
@@ -178,13 +179,13 @@ class Board:
             if self.isValid(num, position[0], position[1]):
                 self.select(position[0], position[1])
                 self.place(num)
-                draw_screen(game_active, solved, self)
+                draw_screen(game_active, solved, self, start_time)
                 pygame.time.delay(60) # delay so the visualization isn't too fast to be seen
-                if self.solve(game_active, solved) == True:
+                if self.solve(game_active, solved, start_time) == True:
                     return True
                 self.select(position[0], position[1])
                 self.delete()
-                draw_screen(game_active, solved, self)
+                draw_screen(game_active, solved, self, start_time)
                 pygame.time.delay(60)
                 
 
